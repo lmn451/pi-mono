@@ -5916,6 +5916,23 @@ export const MODELS = {
 			contextWindow: 204800,
 			maxTokens: 131072,
 		} satisfies Model<"openai-completions">,
+		"glm-5-free": {
+			id: "glm-5-free",
+			name: "GLM-5 Free",
+			api: "openai-completions",
+			provider: "opencode",
+			baseUrl: "https://opencode.ai/zen/v1",
+			reasoning: true,
+			input: ["text"],
+			cost: {
+				input: 0,
+				output: 0,
+				cacheRead: 0,
+				cacheWrite: 0,
+			},
+			contextWindow: 204800,
+			maxTokens: 131072,
+		} satisfies Model<"openai-completions">,
 		"gpt-5": {
 			id: "gpt-5",
 			name: "GPT-5",
@@ -6069,6 +6086,7 @@ export const MODELS = {
 			contextWindow: 400000,
 			maxTokens: 128000,
 		} satisfies Model<"openai-responses">,
+<<<<<<< HEAD
 		"gpt-5.3-codex": {
 			id: "gpt-5.3-codex",
 			name: "GPT-5.3 Codex",
@@ -6086,6 +6104,42 @@ export const MODELS = {
 			contextWindow: 400000,
 			maxTokens: 128000,
 		} satisfies Model<"openai-responses">,
+=======
+		"kimi-k2": {
+			id: "kimi-k2",
+			name: "Kimi K2",
+			api: "openai-completions",
+			provider: "opencode",
+			baseUrl: "https://opencode.ai/zen/v1",
+			reasoning: false,
+			input: ["text"],
+			cost: {
+				input: 0.4,
+				output: 2.5,
+				cacheRead: 0.4,
+				cacheWrite: 0,
+			},
+			contextWindow: 262144,
+			maxTokens: 262144,
+		} satisfies Model<"openai-completions">,
+		"kimi-k2-thinking": {
+			id: "kimi-k2-thinking",
+			name: "Kimi K2 Thinking",
+			api: "openai-completions",
+			provider: "opencode",
+			baseUrl: "https://opencode.ai/zen/v1",
+			reasoning: true,
+			input: ["text"],
+			cost: {
+				input: 0.4,
+				output: 2.5,
+				cacheRead: 0.4,
+				cacheWrite: 0,
+			},
+			contextWindow: 262144,
+			maxTokens: 262144,
+		} satisfies Model<"openai-completions">,
+>>>>>>> ba32caf4 (fix(ai): avoid treating opencode fallback token as full auth)
 		"kimi-k2.5": {
 			id: "kimi-k2.5",
 			name: "Kimi K2.5",
@@ -6915,13 +6969,17 @@ export const MODELS = {
 			reasoning: true,
 			input: ["text"],
 			cost: {
-				input: 0.25,
-				output: 0.39999999999999997,
-				cacheRead: 0,
+				input: 0.26,
+				output: 0.38,
+				cacheRead: 0.13,
 				cacheWrite: 0,
 			},
 			contextWindow: 163840,
+<<<<<<< HEAD
 			maxTokens: 65536,
+=======
+			maxTokens: 4096,
+>>>>>>> ba32caf4 (fix(ai): avoid treating opencode fallback token as full auth)
 		} satisfies Model<"openai-completions">,
 		"deepseek/deepseek-v3.2-exp": {
 			id: "deepseek/deepseek-v3.2-exp",
@@ -8691,6 +8749,7 @@ export const MODELS = {
 			contextWindow: 400000,
 			maxTokens: 128000,
 		} satisfies Model<"openai-completions">,
+<<<<<<< HEAD
 		"openai/gpt-5.3-chat": {
 			id: "openai/gpt-5.3-chat",
 			name: "OpenAI: GPT-5.3 Chat",
@@ -8725,6 +8784,8 @@ export const MODELS = {
 			contextWindow: 400000,
 			maxTokens: 128000,
 		} satisfies Model<"openai-completions">,
+=======
+>>>>>>> ba32caf4 (fix(ai): avoid treating opencode fallback token as full auth)
 		"openai/gpt-oss-120b": {
 			id: "openai/gpt-oss-120b",
 			name: "OpenAI: gpt-oss-120b",
@@ -9720,9 +9781,15 @@ export const MODELS = {
 			reasoning: true,
 			input: ["text", "image"],
 			cost: {
+<<<<<<< HEAD
 				input: 0.39,
 				output: 2.34,
 				cacheRead: 0,
+=======
+				input: 0.15,
+				output: 1,
+				cacheRead: 0.15,
+>>>>>>> ba32caf4 (fix(ai): avoid treating opencode fallback token as full auth)
 				cacheWrite: 0,
 			},
 			contextWindow: 262144,
@@ -10230,13 +10297,19 @@ export const MODELS = {
 			reasoning: true,
 			input: ["text"],
 			cost: {
+<<<<<<< HEAD
 				input: 0.3,
 				output: 1.4,
 				cacheRead: 0.15,
+=======
+				input: 0.38,
+				output: 1.7,
+				cacheRead: 0.19,
+>>>>>>> ba32caf4 (fix(ai): avoid treating opencode fallback token as full auth)
 				cacheWrite: 0,
 			},
 			contextWindow: 202752,
-			maxTokens: 4096,
+			maxTokens: 65535,
 		} satisfies Model<"openai-completions">,
 		"z-ai/glm-4.7-flash": {
 			id: "z-ai/glm-4.7-flash",
@@ -10264,9 +10337,15 @@ export const MODELS = {
 			reasoning: true,
 			input: ["text"],
 			cost: {
+<<<<<<< HEAD
 				input: 0.7999999999999999,
 				output: 2.56,
 				cacheRead: 0.16,
+=======
+				input: 0.95,
+				output: 2.5500000000000003,
+				cacheRead: 0,
+>>>>>>> ba32caf4 (fix(ai): avoid treating opencode fallback token as full auth)
 				cacheWrite: 0,
 			},
 			contextWindow: 202752,
@@ -10477,23 +10556,6 @@ export const MODELS = {
 			},
 			contextWindow: 256000,
 			maxTokens: 256000,
-		} satisfies Model<"anthropic-messages">,
-		"alibaba/qwen3.5-flash": {
-			id: "alibaba/qwen3.5-flash",
-			name: "Qwen 3.5 Flash",
-			api: "anthropic-messages",
-			provider: "vercel-ai-gateway",
-			baseUrl: "https://ai-gateway.vercel.sh",
-			reasoning: true,
-			input: ["text", "image"],
-			cost: {
-				input: 0.09999999999999999,
-				output: 0.39999999999999997,
-				cacheRead: 0.001,
-				cacheWrite: 0.125,
-			},
-			contextWindow: 1000000,
-			maxTokens: 64000,
 		} satisfies Model<"anthropic-messages">,
 		"alibaba/qwen3.5-plus": {
 			id: "alibaba/qwen3.5-plus",
@@ -11940,6 +12002,7 @@ export const MODELS = {
 			contextWindow: 400000,
 			maxTokens: 128000,
 		} satisfies Model<"anthropic-messages">,
+<<<<<<< HEAD
 		"openai/gpt-5.3-chat": {
 			id: "openai/gpt-5.3-chat",
 			name: "GPT-5.3 Chat",
@@ -11974,6 +12037,8 @@ export const MODELS = {
 			contextWindow: 400000,
 			maxTokens: 128000,
 		} satisfies Model<"anthropic-messages">,
+=======
+>>>>>>> ba32caf4 (fix(ai): avoid treating opencode fallback token as full auth)
 		"openai/gpt-oss-120b": {
 			id: "openai/gpt-oss-120b",
 			name: "gpt-oss-120b",
