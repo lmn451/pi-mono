@@ -8,9 +8,6 @@
 
 import {
 	getEnvApiKey,
-	getOAuthApiKey,
-	getOAuthProvider,
-	getOAuthProviders,
 	hasEnvApiKey,
 	type OAuthCredentials,
 	type OAuthLoginCallbacks,
