@@ -56,6 +56,42 @@ const COPILOT_STATIC_HEADERS = {
 const AI_GATEWAY_MODELS_URL = "https://ai-gateway.vercel.sh/v1";
 const AI_GATEWAY_BASE_URL = "https://ai-gateway.vercel.sh";
 
+const OPENCODE_ZEN_MODELS_URL = "https://opencode.ai/zen/v1/models";
+const OPENCODE_GO_MODELS_URL = "https://opencode.ai/zen/go/v1/models";
+
+interface OpenCodeModelList {
+	object: string;
+	data: Array<{
+		id: string;
+		object: string;
+		created: number;
+		owned_by: string;
+	}>;
+}
+
+async function fetchOpenCodeModels(): Promise<{ opencode: Set<string>; "opencode-go": Set<string> }> {
+	try {
+		console.log("Fetching models from OpenCode Zen API...");
+
+		const [zenResponse, goResponse] = await Promise.all([
+			fetch(OPENCODE_ZEN_MODELS_URL),
+			fetch(OPENCODE_GO_MODELS_URL),
+		]);
+
+		const zenData: OpenCodeModelList = await zenResponse.json();
+		const goData: OpenCodeModelList = await goResponse.json();
+
+		const opencodeModels = new Set(zenData.data.map((m) => m.id));
+		const opencodeGoModels = new Set(goData.data.map((m) => m.id));
+
+		console.log(`Fetched ${opencodeModels.size} OpenCode Zen models, ${opencodeGoModels.size} OpenCode Go models`);
+		return { opencode: opencodeModels, "opencode-go": opencodeGoModels };
+	} catch (error) {
+		console.error("Failed to fetch OpenCode models:", error);
+		return { opencode: new Set(), "opencode-go": new Set() };
+	}
+}
+
 async function fetchOpenRouterModels(): Promise<Model<any>[]> {
 	try {
 		console.log("Fetching models from OpenRouter API...");
@@ -638,19 +674,37 @@ async function loadModelsDevData(): Promise<Model<any>[]> {
 }
 
 async function generateModels() {
-	// Fetch models from both sources
-	// models.dev: Anthropic, Google, OpenAI, Groq, Cerebras
+	// Fetch models from all sources
+	// models.dev: Anthropic, Google, OpenAI, Groq, Cerebras, OpenCode, etc.
 	// OpenRouter: xAI and other providers (excluding Anthropic, Google, OpenAI)
 	// AI Gateway: OpenAI-compatible catalog with tool-capable models
+	// OpenCode Zen API: Validates which models are available on opencode.ai
 	const modelsDevModels = await loadModelsDevData();
 	const openRouterModels = await fetchOpenRouterModels();
 	const aiGatewayModels = await fetchAiGatewayModels();
+	const openCodeAvailable = await fetchOpenCodeModels();
 
 	// Combine models (models.dev has priority)
-	const allModels = [...modelsDevModels, ...openRouterModels, ...aiGatewayModels].filter(
+	let allModels = [...modelsDevModels, ...openRouterModels, ...aiGatewayModels].filter(
 		(model) =>
 			!((model.provider === "opencode" || model.provider === "opencode-go") && model.id === "gpt-5.3-codex-spark"),
 	);
+
+	// Validate opencode models exist on opencode.ai and flag deprecated ones
+	const opencodeModels = allModels.filter(m => m.provider === "opencode");
+	const opencodeGoModels = allModels.filter(m => m.provider === "opencode-go");
+
+	for (const model of opencodeModels) {
+		if (!openCodeAvailable.opencode.has(model.id)) {
+			console.warn(`Warning: OpenCode model "${model.id}" not found in Zen API (may be deprecated)`);
+		}
+	}
+
+	for (const model of opencodeGoModels) {
+		if (!openCodeAvailable["opencode-go"].has(model.id)) {
+			console.warn(`Warning: OpenCode Go model "${model.id}" not found in Zen API (may be deprecated)`);
+		}
+	}
 
 	// Fix incorrect cache pricing for Claude Opus 4.5 from models.dev
 	// models.dev has 3x the correct pricing (1.5/18.75 instead of 0.5/6.25)
