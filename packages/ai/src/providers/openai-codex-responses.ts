@@ -135,7 +135,8 @@ export const streamOpenAICodexResponses: StreamFunction<"openai-codex-responses"
 
 		try {
 			const apiKey = options?.apiKey || getEnvApiKey(model.provider) || "";
-			if (!apiKey) {
+			const isFree = model.cost.input === 0 && model.cost.output === 0;
+			if (!apiKey && !isFree) {
 				throw new Error(`No API key for provider: ${model.provider}`);
 			}
 
@@ -276,7 +277,8 @@ export const streamSimpleOpenAICodexResponses: StreamFunction<"openai-codex-resp
 	options?: SimpleStreamOptions,
 ): AssistantMessageEventStream => {
 	const apiKey = options?.apiKey || getEnvApiKey(model.provider);
-	if (!apiKey) {
+	const isFree = model.cost.input === 0 && model.cost.output === 0;
+	if (!apiKey && !isFree) {
 		throw new Error(`No API key for provider: ${model.provider}`);
 	}
 

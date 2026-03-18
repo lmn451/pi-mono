@@ -480,7 +480,8 @@ export const streamSimpleAnthropic: StreamFunction<"anthropic-messages", SimpleS
 	options?: SimpleStreamOptions,
 ): AssistantMessageEventStream => {
 	const apiKey = options?.apiKey || getEnvApiKey(model.provider);
-	if (!apiKey) {
+	const isFree = model.cost.input === 0 && model.cost.output === 0;
+	if (!apiKey && !isFree) {
 		throw new Error(`No API key for provider: ${model.provider}`);
 	}
 
