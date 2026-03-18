@@ -485,7 +485,7 @@ export const streamSimpleAnthropic: StreamFunction<"anthropic-messages", SimpleS
 		throw new Error(`No API key for provider: ${model.provider}`);
 	}
 
-	const base = buildBaseOptions(model, options, apiKey);
+	const base = buildBaseOptions(model, options, isFree ? undefined : apiKey);
 	if (!options?.reasoning) {
 		return streamAnthropic(model, context, { ...base, thinkingEnabled: false } satisfies AnthropicOptions);
 	}
@@ -522,14 +522,40 @@ function isOAuthToken(apiKey: string): boolean {
 
 function createClient(
 	model: Model<"anthropic-messages">,
-	apiKey: string,
+	apiKey: string | undefined,
 	interleavedThinking: boolean,
 	optionsHeaders?: Record<string, string>,
 	dynamicHeaders?: Record<string, string>,
 ): { client: Anthropic; isOAuthToken: boolean } {
+	const isFree = model.cost.input === 0 && model.cost.output === 0;
+
 	// Adaptive thinking models (Opus 4.6, Sonnet 4.6) have interleaved thinking built-in.
 	// The beta header is deprecated on Opus 4.6 and redundant on Sonnet 4.6, so skip it.
 	const needsInterleavedBeta = interleavedThinking && !supportsAdaptiveThinking(model.id);
+
+	// Free models - omit auth headers entirely
+	if (isFree) {
+		const betaFeatures = ["fine-grained-tool-streaming-2025-05-14"];
+		if (needsInterleavedBeta) {
+			betaFeatures.push("interleaved-thinking-2025-05-14");
+		}
+
+		const client = new Anthropic({
+			apiKey: undefined,
+			baseURL: model.baseUrl,
+			dangerouslyAllowBrowser: true,
+			defaultHeaders: mergeHeaders(
+				{
+					accept: "application/json",
+					"anthropic-dangerous-direct-browser-access": "true",
+					"anthropic-beta": betaFeatures.join(","),
+				},
+				model.headers,
+				optionsHeaders,
+			),
+		});
+		return { client, isOAuthToken: false };
+	}
 
 	// Copilot: Bearer auth, selective betas (no fine-grained-tool-streaming)
 	if (model.provider === "github-copilot") {
@@ -564,7 +590,7 @@ function createClient(
 	}
 
 	// OAuth: Bearer auth, Claude Code identity headers
-	if (isOAuthToken(apiKey)) {
+	if (isOAuthToken(apiKey!)) {
 		const client = new Anthropic({
 			apiKey: null,
 			authToken: apiKey,
@@ -588,7 +614,7 @@ function createClient(
 
 	// API key auth
 	const client = new Anthropic({
-		apiKey,
+		apiKey: apiKey,
 		baseURL: model.baseUrl,
 		dangerouslyAllowBrowser: true,
 		defaultHeaders: mergeHeaders(

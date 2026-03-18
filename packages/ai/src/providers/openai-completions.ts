@@ -329,16 +329,26 @@ function createClient(
 	apiKey?: string,
 	optionsHeaders?: Record<string, string>,
 ) {
+	const isFree = model.cost.input === 0 && model.cost.output === 0;
+
 	if (!apiKey) {
-		if (!process.env.OPENAI_API_KEY) {
+		if (isFree) {
+			apiKey = "";
+		} else if (!process.env.OPENAI_API_KEY) {
 			throw new Error(
 				"OpenAI API key is required. Set OPENAI_API_KEY environment variable or pass it as an argument.",
 			);
+		} else {
+			apiKey = process.env.OPENAI_API_KEY;
 		}
-		apiKey = process.env.OPENAI_API_KEY;
 	}
 
-	const headers = { ...model.headers };
+	const headers: Record<string, string> = {};
+
+	if (!isFree) {
+		headers["Authorization"] = `Bearer ${apiKey}`;
+	}
+
 	if (model.provider === "github-copilot") {
 		const hasImages = hasCopilotVisionInput(context.messages);
 		const copilotHeaders = buildCopilotDynamicHeaders({
@@ -354,7 +364,7 @@ function createClient(
 	}
 
 	return new OpenAI({
-		apiKey,
+		apiKey: isFree ? undefined : apiKey,
 		baseURL: model.baseUrl,
 		dangerouslyAllowBrowser: true,
 		defaultHeaders: headers,
