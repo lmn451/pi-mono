@@ -328,10 +328,13 @@ export async function createAgentSession(options: CreateAgentSessionOptions = {}
 							`Run '/login ${resolvedProvider}' to re-authenticate.`,
 					);
 				}
-				throw new Error(
-					`No API key found for "${resolvedProvider}". ` +
-						`Set an API key environment variable or run '/login ${resolvedProvider}'.`,
-				);
+				const isFree = model && model.cost.input === 0 && model.cost.output === 0;
+				if (!isFree) {
+					throw new Error(
+						`No API key found for "${resolvedProvider}". ` +
+							`Set an API key environment variable or run '/login ${resolvedProvider}'.`,
+					);
+				}
 			}
 			return key;
 		},

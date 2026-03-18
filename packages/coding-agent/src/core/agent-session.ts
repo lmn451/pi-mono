@@ -938,10 +938,13 @@ export class AgentSession {
 						`Run '/login ${this.model.provider}' to re-authenticate.`,
 				);
 			}
-			throw new Error(
-				`No API key found for ${this.model.provider}.\n\n` +
-					`Use /login or set an API key environment variable. See ${join(getDocsPath(), "providers.md")}`,
-			);
+			const isFree = this.model.cost.input === 0 && this.model.cost.output === 0;
+			if (!isFree) {
+				throw new Error(
+					`No API key found for ${this.model.provider}.\n\n` +
+						`Use /login or set an API key environment variable. See ${join(getDocsPath(), "providers.md")}`,
+				);
+			}
 		}
 
 		// Check if we need to compact before sending (catches aborted responses)
