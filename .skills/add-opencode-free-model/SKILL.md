@@ -13,6 +13,8 @@ OpenCode marks free models with `allowAnonymous: true` in their server config, b
 - `cost.input = 0` and `cost.output = 0`
 - Model IDs often contain `-free` suffix (e.g., `minimax-m2.5-free`, `nemotron-3-super-free`)
 
+**Note:** Free models work without an API key. The coding agent skips API key validation for models with zero cost.
+
 ## Usage
 
 Run from the repo root:
